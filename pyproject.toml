@@ -9,7 +9,7 @@ description = "Evaluate LLM agents at two levels: how they behave (framework-agn
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 license = { text = "Apache-2.0" }
-authors = [{ name = "Anh Duong Vo" }]
+authors = [{ name = "Maria (Anh Duong Vo)" }]
 keywords = ["llm", "agents", "evaluation", "langgraph", "llamaindex", "openai", "grounding", "calibration", "healthcare"]
 classifiers = [
   "Programming Language :: Python :: 3",
