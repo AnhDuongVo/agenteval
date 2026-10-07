@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agenteval"
-version = "0.1.0"
-description = "Framework-agnostic evaluation for LLM agents: one schema, adapters for LangGraph, LlamaIndex and OpenAI tool-calling, and behavioral metrics."
+version = "0.2.0"
+description = "Evaluate LLM agents at two levels: how they behave (framework-agnostic traces from LangGraph, LlamaIndex, OpenAI tool-calling) and whether what they say holds (grounding, number accuracy, hallucinated citations, calibration)."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Anh Duong Vo" }]
-keywords = ["llm", "agents", "evaluation", "langgraph", "llamaindex", "openai", "observability"]
+keywords = ["llm", "agents", "evaluation", "langgraph", "llamaindex", "openai", "grounding", "calibration", "healthcare"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: Apache Software License",

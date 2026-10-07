@@ -1,3 +1,3 @@
-"""Framework-agnostic evaluation for LLM agents: one schema, adapters for the common frameworks, one set of metrics."""
+"""Evaluate LLM agents at two levels: behavior (traces) and claims (grounding, numbers, calibration)."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

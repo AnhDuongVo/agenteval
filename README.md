@@ -1,12 +1,15 @@
 # agenteval
 
-**Framework-agnostic evaluation for LLM agents.** One run schema, adapters for the common agent frameworks (LangGraph, LlamaIndex, OpenAI tool-calling), and one set of behavioral metrics. Point it at traces from any of them and get a comparable scorecard.
+**Evaluate LLM agents at two levels.** Level 1 scores how an agent behaves (tool calls, loops, task success) from traces of LangGraph, LlamaIndex or OpenAI tool-calling runs. Level 2 scores what it says (citations that exist, numbers that match the source, calibrated confidence). Most evaluation tooling covers one of the two, for one framework.
 
-## Why
+| Level | Question | Input | Command |
+|---|---|---|---|
+| **Behavior** | Did the agent act well? | Traces from LangGraph, LlamaIndex or OpenAI tool-calling | `agenteval behavior` |
+| **Claims** | Can what it said be trusted? | The agent's claims with citations, numbers and confidence | `agenteval claims` |
 
-Every agent team needs to answer the same questions, whatever framework they built on: does the agent pick the right tools, do the tool calls succeed, is the final answer grounded in what it retrieved, does it get stuck in loops, and how many steps does it take? Most eval tooling is tied to one framework. `agenteval` normalises traces into one schema first, so the metrics (and the leaderboard) work across all of them.
+## Level 1: behavior (framework-agnostic)
 
-## Metrics
+One run schema (`AgentRun`), adapters that normalise each framework's trace into it, and behavioral metrics:
 
 | Metric | Question | Better |
 |---|---|---|
@@ -17,28 +20,35 @@ Every agent team needs to answer the same questions, whatever framework they bui
 | Mean steps | How many steps per run? | context |
 | Loop rate | Does it repeat the same tool call back to back? | lower |
 
-## One schema, three adapters
+Adapters take the plain trace dict each framework emits, so agenteval does not depend on those frameworks being installed: `from_openai` (chat messages with `tool_calls` and `role: "tool"` results), `from_langgraph` (node `events`), `from_llamaindex` (agent `steps`). Shapes are documented in `adapters.py`, with a runnable example per framework in `data/sample_traces.jsonl`.
 
-Each adapter takes the plain trace dict a framework emits and returns a common `AgentRun`, so agenteval does not depend on those frameworks being installed:
+## Level 2: claims (grounding, numbers, calibration)
 
-- `from_openai` — OpenAI chat messages with `tool_calls` and `role: "tool"` results.
-- `from_langgraph` — a list of node `events` (`tool` / `retriever` / `llm`).
-- `from_llamaindex` — agent `steps` (`tool`, `is_error`, `observation`).
+For clinical use the output has to be checkable claim by claim. The `agenteval.clinical` layer scores each claim an agent makes against the sources it had:
 
-The expected shapes are documented in `adapters.py`, with a runnable example per framework in `data/sample_traces.jsonl`.
+| Metric | Question | Better |
+|---|---|---|
+| Grounding rate | Does every claim cite a source that exists? | higher |
+| Hallucinated-citation rate | How many cited ids do not exist? | lower |
+| Number accuracy | Do asserted numbers match the cited source value (rounding tolerated, sign flips not)? | higher |
+| Calibration (ECE, Brier) | Does a stated confidence match how often it is right? | lower |
+
+One small schema (`Record` with `sources` and `Claim`s carrying `citations`, `numbers`, `confidence`, `label`) fits any agent: transcript lines, FHIR facts, table rows or literature ids are the sources; note sentences, eligibility verdicts, drafted claims or ranked statements are the claims. Bundled samples for four clinical agents are in `data/clinical_samples/`, and `agenteval claims` renders a per-task leaderboard (markdown or HTML).
 
 ## Quickstart
 
 ```bash
 pip install -e ".[dev]"
-agenteval data/sample_traces.jsonl        # prints a leaderboard, overall and per framework
+
+agenteval behavior data/sample_traces.jsonl                        # per-framework behavior scorecard
+agenteval claims data/clinical_samples --md leaderboard.md         # per-task claims leaderboard
 ```
 
 ## Development
 
 ```bash
 ruff check .
-pytest
+pytest            # behavior adapters + metrics, and claim-level metrics with known-value tests
 ```
 
 ## License
