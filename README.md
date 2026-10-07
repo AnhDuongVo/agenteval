@@ -7,6 +7,12 @@
 | **Behavior** | Did the agent act well? | Traces from LangGraph, LlamaIndex or OpenAI tool-calling | `agenteval behavior` |
 | **Claims** | Can what it said be trusted? | The agent's claims with citations, numbers and confidence | `agenteval claims` |
 
+## Demo
+
+![agenteval demo](docs/demo.gif)
+
+Both levels on the bundled samples: the behavior scorecard per framework, then the claims leaderboard, which picks up a planted wrong number and a planted citation that does not exist. The video is on [anhduongvo.github.io](https://anhduongvo.github.io/projects/agentic-tooling/).
+
 ## Level 1: behavior (framework-agnostic)
 
 One run schema (`AgentRun`), adapters that normalise each framework's trace into it, and behavioral metrics:
