@@ -4,11 +4,13 @@
 
 Demonstrates selected trace normalization and explicit evaluation metrics for tool use, task outcomes, citations and numerical consistency.
 
-## Watch the demo
+## CLI example
 
-![Demo](docs/demo.gif)
+![Behavior CLI input and output](docs/agenteval-behavior.png)
 
-[Portfolio videos](https://anhduongvo.github.io/projects/agentic-tooling/). Clinical recordings use the separate simplified interactive demo.
+![Claim evaluation CLI input and output](docs/agenteval-claims.png)
+
+[Portfolio examples](https://anhduongvo.github.io/projects/agentic-tooling/). Clinical recordings use the separate simplified interactive demo.
 
 ## Try it offline
 
@@ -53,9 +55,7 @@ See [validation details](docs/validation.md). The architecture and detailed work
 
 ## Demo
 
-![agenteval demo](docs/demo.gif)
-
-Both levels on the bundled samples: the behavior scorecard per framework, then the claims leaderboard, which picks up a planted wrong number and a planted citation that does not exist. The video is on [anhduongvo.github.io](https://anhduongvo.github.io/projects/agentic-tooling/).
+Both levels on the bundled samples: the behavior scorecard per framework, then the claims leaderboard, which picks up a planted wrong number and a planted citation that does not exist. The command/output examples are on [anhduongvo.github.io](https://anhduongvo.github.io/projects/agentic-tooling/).
 
 ## Level 1: behavior (framework-agnostic)
 
