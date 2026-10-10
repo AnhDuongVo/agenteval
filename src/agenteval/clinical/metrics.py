@@ -18,7 +18,7 @@ def _is_number_correct(value: float, source_value: float, rel_tol: float, abs_to
     return diff / denom <= rel_tol
 
 
-def grounding_rate(records: list[Record]) -> float | None:
+def citation_integrity_rate(records: list[Record]) -> float | None:
     """Fraction of claims that cite at least one source and whose every cited id exists in the record."""
     total = grounded = 0
     for r in records:
@@ -28,6 +28,10 @@ def grounding_rate(records: list[Record]) -> float | None:
             if c.citations and all(cid in src for cid in c.citations):
                 grounded += 1
     return grounded / total if total else None
+
+
+# Compatibility alias: existence checks do not establish semantic grounding.
+grounding_rate = citation_integrity_rate
 
 
 def hallucinated_citation_rate(records: list[Record]) -> float | None:
@@ -61,8 +65,8 @@ def number_accuracy(records: list[Record], rel_tol: float = 0.01, abs_tol: float
 
 @dataclass
 class Calibration:
-    ece: float | None          # expected calibration error (lower is better)
-    brier: float | None        # Brier score (lower is better)
+    ece: float | None  # expected calibration error (lower is better)
+    brier: float | None  # Brier score (lower is better)
     accuracy: float | None
     n: int
 
@@ -99,6 +103,7 @@ def evaluate(records: list[Record], rel_tol: float = 0.01, bins: int = 10) -> di
     return {
         "n_records": len(records),
         "n_claims": sum(len(r.claims) for r in records),
+        "citation_integrity_rate": citation_integrity_rate(records),
         "grounding_rate": grounding_rate(records),
         "hallucinated_citation_rate": hallucinated_citation_rate(records),
         "number_accuracy": number_accuracy(records, rel_tol=rel_tol),

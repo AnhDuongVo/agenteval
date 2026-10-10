@@ -14,8 +14,8 @@ def tool_success_rate(runs: list[AgentRun]) -> float | None:
     return ok / total if total else None
 
 
-def tool_selection_accuracy(runs: list[AgentRun]) -> float | None:
-    """Of runs with an expected tool set, the fraction where every expected tool was actually called."""
+def expected_tool_recall(runs: list[AgentRun]) -> float | None:
+    """Legacy expected-set coverage: extra tools do not reduce this score."""
     scored = [r for r in runs if r.expected_tools is not None]
     if not scored:
         return None
@@ -26,13 +26,32 @@ def tool_selection_accuracy(runs: list[AgentRun]) -> float | None:
     return good / len(scored)
 
 
-def grounding_rate(runs: list[AgentRun]) -> float | None:
+def citation_integrity_rate(runs: list[AgentRun]) -> float | None:
     """Of runs that cite anything, the fraction whose every citation is in the retrieved set."""
     scored = [r for r in runs if r.citations]
     if not scored:
         return None
     good = sum(int(set(r.citations).issubset(set(r.retrieved))) for r in scored)
     return good / len(scored)
+
+
+def tool_selection_accuracy(runs: list[AgentRun]) -> float | None:
+    """Exact expected/used set agreement, penalizing extra tools."""
+    scored = [r for r in runs if r.expected_tools is not None]
+    return (
+        sum({s.name for s in r.tool_calls()} == set(r.expected_tools) for r in scored) / len(scored) if scored else None
+    )
+
+
+def tool_precision(runs: list[AgentRun]) -> float | None:
+    scored = [r for r in runs if r.expected_tools is not None]
+    total = sum(len(r.tool_calls()) for r in scored)
+    good = sum(s.name in set(r.expected_tools) for r in scored for s in r.tool_calls())
+    return good / total if total else None
+
+
+# Compatibility alias: this checks reference existence, not semantic grounding.
+grounding_rate = citation_integrity_rate
 
 
 def task_success_rate(runs: list[AgentRun]) -> float | None:
@@ -60,6 +79,9 @@ def evaluate(runs: list[AgentRun]) -> dict:
         "n_runs": len(runs),
         "tool_success_rate": tool_success_rate(runs),
         "tool_selection_accuracy": tool_selection_accuracy(runs),
+        "expected_tool_recall": expected_tool_recall(runs),
+        "tool_precision": tool_precision(runs),
+        "citation_integrity_rate": citation_integrity_rate(runs),
         "grounding_rate": grounding_rate(runs),
         "task_success_rate": task_success_rate(runs),
         "mean_steps": mean_steps(runs),

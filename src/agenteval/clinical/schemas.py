@@ -13,20 +13,20 @@ from pydantic import BaseModel, Field
 
 class NumberClaim(BaseModel):
     value: float
-    source_id: str | None = None          # the source row/fact this number should come from
-    source_value: float | None = None     # the true value in that source, when known
+    source_id: str | None = None  # the source row/fact this number should come from
+    source_value: float | None = None  # the true value in that source, when known
 
 
 class Claim(BaseModel):
     text: str = ""
-    citations: list[str] = Field(default_factory=list)   # source ids the claim cites
+    citations: list[str] = Field(default_factory=list)  # source ids the claim cites
     numbers: list[NumberClaim] = Field(default_factory=list)
-    confidence: float | None = None       # the agent's confidence in [0, 1]
-    label: bool | None = None             # gold: was the claim correct? (for calibration)
+    confidence: float | None = None  # the agent's confidence in [0, 1]
+    label: bool | None = None  # gold: was the claim correct? (for calibration)
 
 
 class Record(BaseModel):
     id: str
-    task: str                              # consult-to-note | trial-matcher | csr-assistant | ai-scientist | ...
-    sources: list[str] = Field(default_factory=list)   # the source ids that actually exist for this item
+    task: str  # consult-to-note | trial-matcher | csr-assistant | ai-scientist | ...
+    sources: list[str] = Field(default_factory=list)  # the source ids that actually exist for this item
     claims: list[Claim] = Field(default_factory=list)

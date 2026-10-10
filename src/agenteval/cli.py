@@ -1,7 +1,7 @@
 """Command line. Two levels of evaluation:
 
-  agenteval behavior <traces.jsonl ...>      how the agent behaves: tool success, selection, grounding, loops
-  agenteval claims   <records.jsonl|dir ...> whether what it says holds: grounding, numbers, calibration
+agenteval behavior <traces.jsonl ...>      how the agent behaves: tool success, selection, grounding, loops
+agenteval claims   <records.jsonl|dir ...> whether what it says holds: grounding, numbers, calibration
 """
 
 from __future__ import annotations
@@ -19,7 +19,10 @@ from .clinical.harness import evaluate_by_task, load_records
 from .clinical.leaderboard import to_html, to_markdown
 from .metrics import evaluate
 
-app = typer.Typer(add_completion=False, help="Evaluate LLM agents at two levels: behavior (traces) and claims (grounding, numbers, calibration).")
+app = typer.Typer(
+    add_completion=False,
+    help="Evaluate LLM agents at two levels: behavior (traces) and claims (citation integrity, numbers, calibration).",
+)
 console = Console()
 
 
@@ -40,7 +43,10 @@ def _dec(v):
 
 
 @app.command()
-def behavior(files: list[str] = typer.Argument(..., help="JSONL traces, one per line (openai | langgraph | llamaindex)"), out: str = typer.Option("", help="write JSON report")):
+def behavior(
+    files: list[str] = typer.Argument(..., help="JSONL traces, one per line (openai | langgraph | llamaindex)"),
+    out: str = typer.Option("", help="write JSON report"),
+):
     """Score agent traces: tool success, tool selection, grounding, task success, mean steps, loop rate."""
     runs = [load(json.loads(line)) for p in _expand(files) for line in Path(p).read_text().splitlines() if line.strip()]
     by_fw = defaultdict(list)
@@ -50,19 +56,38 @@ def behavior(files: list[str] = typer.Argument(..., help="JSONL traces, one per 
     if out:
         Path(out).write_text(json.dumps(report, indent=2))
     table = Table(title="Agent behavior")
-    for c in ["Framework", "Runs", "Tool success", "Tool selection", "Grounding", "Task success", "Mean steps", "Loop rate"]:
+    for c in [
+        "Framework",
+        "Runs",
+        "Tool success",
+        "Tool selection",
+        "Citation integrity",
+        "Task success",
+        "Mean steps",
+        "Loop rate",
+    ]:
         table.add_column(c)
     rows = [{"fw": fw, **s} for fw, s in report["by_framework"].items()] + [{"fw": "overall", **report["overall"]}]
     for r in rows:
         ms = r.get("mean_steps")
-        table.add_row(r["fw"], str(r.get("n_runs", "")), _pct(r.get("tool_success_rate")), _pct(r.get("tool_selection_accuracy")),
-                      _pct(r.get("grounding_rate")), _pct(r.get("task_success_rate")), "n/a" if ms is None else f"{ms:.1f}", _pct(r.get("loop_rate")))
+        table.add_row(
+            r["fw"],
+            str(r.get("n_runs", "")),
+            _pct(r.get("tool_success_rate")),
+            _pct(r.get("tool_selection_accuracy")),
+            _pct(r.get("grounding_rate")),
+            _pct(r.get("task_success_rate")),
+            "n/a" if ms is None else f"{ms:.1f}",
+            _pct(r.get("loop_rate")),
+        )
     console.print(table)
 
 
 @app.command()
 def claims(
-    files: list[str] = typer.Argument(..., help="JSONL records (claims with citations, numbers, confidence) or directories"),
+    files: list[str] = typer.Argument(
+        ..., help="JSONL records (claims with citations, numbers, confidence) or directories"
+    ),
     md: str = typer.Option("", help="write a markdown leaderboard"),
     html: str = typer.Option("", help="write an HTML leaderboard"),
     out: str = typer.Option("", help="write JSON report"),
@@ -78,12 +103,20 @@ def claims(
     if html:
         Path(html).write_text(to_html(data))
     table = Table(title="Agent claims")
-    for c in ["Task", "Items", "Claims", "Grounded", "Hallucinated cites", "Number acc.", "ECE", "Brier"]:
+    for c in ["Task", "Items", "Claims", "Citations valid", "Hallucinated cites", "Number acc.", "ECE", "Brier"]:
         table.add_column(c)
     rows = [{"task": t, **s} for t, s in data["by_task"].items()] + [{"task": "overall", **data["overall"]}]
     for r in rows:
-        table.add_row(r["task"], str(r.get("n_records", "")), str(r.get("n_claims", "")), _pct(r.get("grounding_rate")),
-                      _pct(r.get("hallucinated_citation_rate")), _pct(r.get("number_accuracy")), _dec(r.get("calibration_ece")), _dec(r.get("calibration_brier")))
+        table.add_row(
+            r["task"],
+            str(r.get("n_records", "")),
+            str(r.get("n_claims", "")),
+            _pct(r.get("grounding_rate")),
+            _pct(r.get("hallucinated_citation_rate")),
+            _pct(r.get("number_accuracy")),
+            _dec(r.get("calibration_ece")),
+            _dec(r.get("calibration_brier")),
+        )
     console.print(table)
 
 

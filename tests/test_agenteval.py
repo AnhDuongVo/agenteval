@@ -42,5 +42,12 @@ def test_loop_rate_detects_repeat():
 
 def test_evaluate_keys():
     rep = evaluate(_runs())
-    for k in ["tool_success_rate", "tool_selection_accuracy", "grounding_rate", "task_success_rate", "mean_steps", "loop_rate"]:
+    for k in [
+        "tool_success_rate",
+        "tool_selection_accuracy",
+        "grounding_rate",
+        "task_success_rate",
+        "mean_steps",
+        "loop_rate",
+    ]:
         assert k in rep

@@ -6,7 +6,7 @@ _COLUMNS = [
     ("task", "Task"),
     ("n_records", "Items"),
     ("n_claims", "Claims"),
-    ("grounding_rate", "Grounded"),
+    ("grounding_rate", "Citations valid"),
     ("hallucinated_citation_rate", "Hallucinated cites"),
     ("number_accuracy", "Number accuracy"),
     ("calibration_ece", "ECE"),
@@ -42,7 +42,7 @@ def to_markdown(report: dict, title: str = "Clinical agent evaluation") -> str:
         lines.append("| " + " | ".join(cells) + " |")
     lines += [
         "",
-        "Grounded: claims that cite at least one source that exists. Hallucinated cites: cited ids that do "
+        "Citations valid: claims with at least one citation and every cited ID present in the source set; this is not semantic entailment. Hallucinated cites: cited ids that do "
         "not exist (lower is better). Number accuracy: asserted numbers matching the cited source. ECE/Brier: "
         "confidence calibration (lower is better).",
     ]
