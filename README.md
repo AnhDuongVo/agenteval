@@ -1,5 +1,13 @@
 # agenteval
 
+## Motivation
+
+A plausible final answer does not reveal whether an agent used unnecessary tools, repeated a loop or cited evidence that was never retrieved. Traces from different frameworks also need consistent interpretation before their scores can be compared.
+
+## What the program does
+
+agenteval converts supported agent traces into a common representation and produces scorecards for tool use, loops and supplied task outcomes. A separate claims workflow screens citation IDs and numerical consistency against supplied evidence and reports confidence metrics when labels are available. It helps developers inspect failures and compare runs under explicit metric definitions; the scores do not establish semantic or domain correctness.
+
 ## What this project demonstrates
 
 Demonstrates selected trace normalization and explicit evaluation metrics for tool use, task outcomes, citations and numerical consistency.
