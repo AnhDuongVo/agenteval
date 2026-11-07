@@ -32,9 +32,9 @@ agenteval behavior data/sample_traces.jsonl
 pytest -q
 ```
 
-## Run with NVIDIA or another configured backend
+## Run with a configured model backend
 
-No NVIDIA endpoint is required. Capture supported trace shapes from your own configured agent; the adapters do not support every framework/version automatically. Calibration reports evaluate supplied labels and do not calibrate the underlying model.
+No specific model provider is required. Capture supported trace shapes from your own configured agent; the adapters do not support every framework/version automatically. Calibration reports evaluate supplied labels and do not calibrate the underlying model.
 
 Model IDs in `.env.example` and NAT configs are examples, not a current availability guarantee. Check your endpoint before running; the validation below does not include live model execution.
 
